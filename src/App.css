@@ -1,0 +1,95 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.cruncbox {
+  flex-direction: row;
+  background-color: gray;
+  padding: 1.2em;
+  transition: border-color 0.25s;
+}
+
+.buttonbox {
+  display: flex;
+  justify-content: space-between;
+  background-color: antiquewhite;
+  padding: 1em;
+  min-width: 500px;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+}
+
+.buttonbox.button {
+  padding: 1em;
+  margin: 1em;
+}
+
+.cardbox {
+  padding: 10px;
+  margin: 10px;
+}
+
+.cardrow {
+  display: flex;
+  flex-direction: row;
+}
+
+.colorboardbox {
+  flex-direction: row;
+  background-color: gray;
+  padding: 1.2em;
+  transition: border-color 0.25s;
+}
+
+.colorboardrow {
+  display: flex;
+  flex-direction: row;
+}
+
+.colortile {
+  background-color: white;
+  margin: 1em;
+  height: 6em;
+  width: 6em;
+  color: black;
+}
