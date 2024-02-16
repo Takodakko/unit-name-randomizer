@@ -1,79 +1,123 @@
-import { useState } from 'react';
+import { MouseEventHandler, useState } from 'react';
 import Card from './Card';
+import {aCard}  from './Hanafuda';
 
-function GameBoard(props: {cardNumber: number, deleteFromHidden: Function, assignToShown: Function, getMonthValueFromHidden: Function, resetAllMonthValues: Function, assignToHidden: Function}) {
-    const initialFaceDown = new Array();
-    initialFaceDown.length = props.cardNumber;
-    initialFaceDown.fill(true);
-    const rowLength = props.cardNumber / 2;
-    const [faceDownCards, setFaceDownCards] = useState(initialFaceDown);
-    const cardList = ['january_crane', 'january_scroll', 'january_plain1', 'january_plain2', 'february_bird', 'february_scroll', 'february_plain1', 'february_plain2', 'march_curtain', 'march_scroll', 'march_plain1', 'march_plain2', 'april_bird', 'april_scroll', 'april_plain1', 'april_plain2', 'may_dock', 'may_scroll', 'may_plain1', 'may_plain2', 'june_butterfly', 'june_scroll', 'june_plain1', 'june_plain2', 'july_boar', 'july_scroll', 'july_plain1', 'july_plain2', 'august_moon', 'august_geese', 'august_plain1', 'august_plain2', 'september_sake', 'september_scroll', 'september_plain1', 'september_plain2', 'october_deer', 'october_scroll', 'october_plain1', 'october_plain2', 'november_man', 'november_bird', 'november_bird', 'november_thunder', 'december_phoenix', 'december_plain1', 'december_plain2', 'december_plain3'];
-    const [cardValues, setCardValues] = useState(initializeCardValues());
-  
-    function initializeCardValues() {
-      const cards = [];
-      const copyCardList = [...cardList];
-      for (let i = 0; i < props.cardNumber; i++) {
-        const randomNumber = Math.floor(Math.random() * copyCardList.length);
-        cards.push(copyCardList[randomNumber]);
-        copyCardList.splice(randomNumber, 1);
-      }
-      return cards;
-    }
-  
-    function resetCardValues() {
-      const newValues = initializeCardValues();
-      setCardValues(newValues);
-      setFaceDownCards(initialFaceDown);
-      props.resetAllMonthValues();
+function GameBoard(props: {
+    cardNumber: number,
+    rowLength: number, 
+    resetCardValues: Function, 
+    calculateCardValues: MouseEventHandler<HTMLButtonElement>, 
+    cardValues: aCard[],
+    }) {
+    
+    const [cardsInDeck, setCardsInDeck] = useState(sortCards('deck'));
+    const [cardsFaceUp, setCardsFaceUp] = useState(sortCards('up'));
+    const [cardsFaceDown, setCardsFaceDown] = useState(sortCards('down'));
+
+    function resetGame() {
+        props.resetCardValues();
+        setCardsInDeck(sortCards('deck'));
+        setCardsInDeck(sortCards('down'));
+        setCardsInDeck(sortCards('up'));
     }
 
-    function calculateCardValues() {
-        console.log('calculating...');
-        
-    }
+    function flipCard(id: string, place: 'up' | 'down' | 'deck') {
+        const copyUpCards = [...cardsFaceUp];
+        const copyDownCards = [...cardsFaceDown];
+        const copyDeck = [...cardsInDeck];
 
-    function flipCard(id: string) {
-          const cardToChange = parseInt(id, 10);
-          const newState = [...faceDownCards];
-          newState[cardToChange] = false;
-          setFaceDownCards(newState);
-          const month = props.getMonthValueFromHidden(id);
-        //   props.assignToShown(id, month);
-          props.deleteFromHidden(id, month);
-      }
-
-    function makeCardRow(number: number, frontOfCard: boolean) {
-      const cards = [];
-      for (let i = 0; i < number; i++) {
-        const cardId = !frontOfCard ? (i + rowLength).toString() : i.toString();
-        const chosenCard = !frontOfCard ? cardValues[i] : cardValues[i + rowLength];
-        const monthValue = chosenCard.slice(0, chosenCard.indexOf('_'));
-        if (!frontOfCard) {
-            props.assignToShown(cardId, monthValue);
+        if (place === 'up') {
+            return;
+        } else if (place === 'down') {
+            const cardToChange = copyDownCards.findIndex((card) => card.id === id)
+            copyDownCards[cardToChange].faceUp = true;
+            copyUpCards.push(copyDownCards[cardToChange]);
+            copyDownCards.splice(cardToChange, 1);
+            setCardsFaceUp(copyUpCards);
+            setCardsFaceDown(copyDownCards);
         } else {
-            props.assignToHidden(cardId, monthValue);
+            copyDeck[0].faceUp = true;
+            copyDeck[0].inDeck = false;
+            copyUpCards.push(copyDeck[0]);
+            copyDeck.shift();
+            setCardsFaceUp(copyUpCards);
+            setCardsInDeck(copyDeck);
         }
-        const aCard = <div className="cardbox">
-        <Card monthValue={monthValue} blank={!frontOfCard ? frontOfCard : faceDownCards[i]} flipCard={() => flipCard(cardId)} id={cardId} chosenCard={chosenCard}/>
-      </div>
-      cards.push(aCard);
+    }
+
+    function sortCards(group: 'deck' | 'up' | 'down') {
+      const theFullSet = props.cardValues;
+      const up: aCard[] = [];
+      const down: aCard[] = [];
+      const deck: aCard[] = [];
+      
+      if (group === 'up') {
+        for (let i = 0; i < props.rowLength; i++) {
+            const aNewCard = theFullSet[i];
+            up.push(aNewCard);
+        }
+        return up;
+      } else if (group === 'down') {
+        for (let i = props.rowLength; i < (props.rowLength * 2); i++) {
+            const aNewCard = theFullSet[i];
+            down.push(aNewCard);
+        }
+        return down;
+      } else {
+        for (let i = (props.rowLength * 2); i < theFullSet.length; i++) {
+            const aNewCard = theFullSet[i];
+            deck.push(aNewCard);
+        }
+        return deck;
       }
-      return cards;
+    }
+    
+    function makeCardRow(arrayName: 'cardsFaceUp' | 'cardsFaceDown' | 'cardsInDeck'): JSX.Element[] {
+        const displayCardsFaceUp: JSX.Element[] = [];
+        const displayCardsFaceDown: JSX.Element[] = [];
+        const displayCardsInDeck: JSX.Element[] = [];
+        
+      if (arrayName === 'cardsFaceUp') {
+        for (let i = 0; i < cardsFaceUp.length; i++) {
+            const aNewCard = <div className="cardbox">
+            <Card monthValue={cardsFaceUp[i].monthValue} faceUp={cardsFaceUp[i].faceUp} flipCard={() => flipCard(cardsFaceUp[i].id, 'up')} id={cardsFaceUp[i].id} chosenCard={cardsFaceUp[i].value} altText={cardsFaceUp[i].readableName}/>
+          </div>
+          displayCardsFaceUp.push(aNewCard);
+        }
+        return displayCardsFaceUp;
+      } else if (arrayName === 'cardsFaceDown') {
+        for (let i = 0; i < cardsFaceDown.length; i++) {
+            const aNewCard = <div className="cardbox">
+            <Card monthValue={cardsFaceDown[i].monthValue} faceUp={cardsFaceDown[i].faceUp} flipCard={() => flipCard(cardsFaceDown[i].id, 'down')} id={cardsFaceDown[i].id} chosenCard={cardsFaceDown[i].value} altText={cardsFaceDown[i].readableName}/>
+          </div>
+          displayCardsFaceDown.push(aNewCard);
+        }
+        return displayCardsFaceDown;
+      } else {
+        const aNewCard = <div className="cardbox">
+            <Card monthValue={cardsInDeck[0].monthValue} faceUp={cardsInDeck[0].faceUp} flipCard={() => flipCard(cardsInDeck[0].id, 'deck')} id={cardsInDeck[0].id} chosenCard={cardsInDeck[0].value} altText={cardsInDeck[0].readableName}/>
+          </div>
+        displayCardsInDeck.push(aNewCard);
+        return displayCardsInDeck;
+      }
     }
 
     return (
         <>
         <br></br>
         <div className="cardrow">
-            {makeCardRow(rowLength, false)}
+          {...makeCardRow('cardsInDeck')}
         </div>
         <br></br>
         <div className="cardrow">
-            {makeCardRow(rowLength, true)}
+            {...makeCardRow('cardsFaceDown')}
         </div>
-        <button className="hanafudabutton" onClick={resetCardValues}>Reset</button><br></br>
-        <button className="hanafudabutton" onClick={calculateCardValues}>What's my score?</button>
+        <br></br>
+        <div className="cardrow">
+            {...makeCardRow('cardsFaceUp')}
+        </div>
+        <button className="hanafudabutton" onClick={() => resetGame()}>Reset</button><br></br>
+        <button className="hanafudabutton" onClick={props.calculateCardValues}>What's my score?</button>
         </>
     )
 };
