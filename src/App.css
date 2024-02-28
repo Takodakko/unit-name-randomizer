@@ -57,6 +57,13 @@
   position: fixed;
   top: 0px;
   left: 0px;
+  z-index: 200;
+}
+
+.contentbox {
+  position: relative;
+  top: 100px;
+  left: 0px;
 }
 
 .buttonbox.button {
@@ -67,6 +74,13 @@
 .cardbox {
   padding: 10px;
   margin: 10px;
+}
+
+.cardboxscoring {
+  padding: 10px;
+  margin: 10px;
+  border-style: solid;
+  border-color: yellow;
 }
 
 .cardrow {
