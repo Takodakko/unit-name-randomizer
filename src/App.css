@@ -33,21 +33,6 @@
   }
 }
 
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-.cruncbox {
-  flex-direction: row;
-  background-color: gray;
-  padding: 1.2em;
-  transition: border-color 0.25s;
-}
-
 .buttonbox {
   display: flex;
   justify-content: space-between;
@@ -60,15 +45,13 @@
   z-index: 200;
 }
 
-.contentbox {
-  position: relative;
-  top: 100px;
-  left: 0px;
-}
-
 .buttonbox.button {
   padding: 1em;
   margin: 1em;
+}
+
+.card {
+  padding: 2em;
 }
 
 .cardbox {
@@ -84,6 +67,16 @@
 .cardrow {
   display: flex;
   flex-direction: row;
+}
+
+.chosen {
+  border: 1px solid transparent;
+  border-color: red;
+}
+
+.chosenbutton {
+  color: red;
+  background-color: orange;
 }
 
 .colorboardbox {
@@ -106,6 +99,19 @@
   color: black;
 }
 
+.contentbox {
+  position: relative;
+  top: 100px;
+  left: 0px;
+}
+
+.cruncbox {
+  flex-direction: row;
+  background-color: gray;
+  padding: 1.2em;
+  transition: border-color 0.25s;
+}
+
 .hanafudabutton {
   margin: 5px;
 }
@@ -115,12 +121,6 @@
   right: 50px;
 }
 
-.chosen {
-  border: 1px solid transparent;
-  border-color: red;
-}
-
-.chosenbutton {
-  color: red;
-  background-color: orange;
+.read-the-docs {
+  color: #888;
 }

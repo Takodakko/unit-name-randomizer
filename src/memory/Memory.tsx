@@ -40,9 +40,10 @@ interface aCard {
 function Memory() {
     const cardList = ['january_crane', 'january_scroll', 'january_plain1', 'january_plain2', 'february_bird', 'february_scroll', 'february_plain1', 'february_plain2', 'march_curtain', 'march_scroll', 'march_plain1', 'march_plain2', 'april_bird', 'april_scroll', 'april_plain1', 'april_plain2', 'may_dock', 'may_scroll', 'may_plain1', 'may_plain2', 'june_butterfly', 'june_scroll', 'june_plain1', 'june_plain2', 'july_boar', 'july_scroll', 'july_plain1', 'july_plain2', 'august_moon', 'august_geese', 'august_plain1', 'august_plain2', 'september_sake', 'september_scroll', 'september_plain1', 'september_plain2', 'october_deer', 'october_scroll', 'october_plain1', 'october_plain2', 'november_man', 'november_scroll', 'november_bird', 'november_thunder', 'december_phoenix', 'december_plain1', 'december_plain2', 'december_plain3'];
     const [hardMode, setHardMode] = useState(false);
-    const numberOfTurnsHard = 4;
+    const numberOfTurnsHard = 48;
     const numberOfTurnsEasy = 72;
     const [remainingTurns, setRemainingTurns] = useState(numberOfTurnsEasy);
+
     const initialState: GameState = {
         win: false,
         faceDownCards: [],
@@ -56,22 +57,23 @@ function Memory() {
       const newRef = useRef(null);
       refStorage.set(i.toString(), newRef);
     }
+
     const initialCardSet: aCard[] = [];
     const [gameState, setGameState] = useState(initialState);
     const [cardSet, setCardSet] = useState(initialCardSet);
     const [played, setPlayed] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
 
-
     useEffect(() => {
       if (remainingTurns < 1) {
-        setGameState({...gameState, win: true});
+        setTimeout(() => setGameState({...gameState, win: true}), 1000);
       }
     }, [remainingTurns, gameState.win]);
 
     function initializeCardValues() {
         const cards = [];
         const copyCardList = [...cardList];
+
         for (let i = 0; i < cardList.length; i++) {
           const randomNumber = Math.floor(Math.random() * copyCardList.length);
     
@@ -83,9 +85,11 @@ function Memory() {
             faceUp: true,
             scored: false
           };
+
           cards.push(newCard);
           copyCardList.splice(randomNumber, 1);
         }
+
         setCardSet(cards);
         setHardMode(false);
         setRemainingTurns(numberOfTurnsEasy);
@@ -99,18 +103,21 @@ function Memory() {
       }
     
     function flipCard (id: string, e: React.SyntheticEvent) {
-      console.log(gameState.win, 'won?')
+      
       if (remainingTurns < 1) {
         return;
       }
+
       const target = e.target as HTMLImageElement;
-      console.log('flip', id);
+      
       const copyGameState = {...gameState};
       const arrayToUse = target.alt !== 'back of card' ? copyGameState.faceUpCards : copyGameState.faceDownCards;
       const indexToChange = arrayToUse.findIndex((card) => card.id === id);
+
       if (indexToChange === -1) {
         return;
       }
+
       const cardToChange = arrayToUse[indexToChange];
 
       if (target.alt === 'back of card') {
@@ -125,10 +132,12 @@ function Memory() {
             const ids:string[] = [];
             copyGameState.matchingCards.push(...copyGameState.faceUpCards);
             copyGameState.matchingCards.push(cardToChange);
+
             copyGameState.faceUpCards.forEach((card) => {
               card.scored = true;
               ids.push(card.id);
             });
+
             ids.forEach((id) => {
               const otherScoringCard = refStorage.get(id);
               otherScoringCard.current.className = 'cardbox cardboxscoring';
@@ -165,6 +174,7 @@ function Memory() {
         return deck;
     }
     const deckToUse = makeDeckLayout();
+
     function layoutRow(deck: JSX.Element[], start: number, finish: number) {
         const cardsToUse = deck.slice(start, finish);
         let newRow: JSX.Element = <div className="cardrow">{...cardsToUse}<br></br></div>;
@@ -215,7 +225,6 @@ function Memory() {
     }
 
     
-
     if (!gameState.win) {
     return (
         <>

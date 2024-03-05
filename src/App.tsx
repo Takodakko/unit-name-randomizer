@@ -23,7 +23,9 @@ function App() {
     hanafuda: false,
     memory: false
   };
+
   const [showElement, setShowElement] = useState(displayedElement);
+  
   function changeShownElement(el: 'colorboard' | 'crunc' | 'hanafuda' | 'memory') {
     const copyShowElement = {...showElement};
     const targetElementValue = !showElement[el];

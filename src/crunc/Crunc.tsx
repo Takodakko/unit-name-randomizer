@@ -10,8 +10,11 @@ function Crunc() {
           return Math.floor(Math.random() * (nouns.list.length));
         }
       }
+
       const [adjective, setAdjective] = useState(adjectives.list[0]);
+
       const [noun, setNoun] = useState(nouns.list[0]);
+      
       const setAdjectiveAndNoun = function() {
         setAdjective((adjective) => {
           adjective = adjectives.list[chooseRandom('adjectives')]

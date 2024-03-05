@@ -46,7 +46,6 @@ function GameBoard(props: {
             setActiveCardsInDeck(copyDeck);
         }
         if (activeCardsFaceUp.length > 7) {
-          
           setCanReveal(false);
         }
     }

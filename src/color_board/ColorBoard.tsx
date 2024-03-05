@@ -3,10 +3,13 @@ import { useState } from 'react';
 
 function ColorBoard(props: {tileNumber: number}) {
   const boardLengthArray: number[] = [];
+
   for (let i = 0; i < props.tileNumber * props.tileNumber; i++) {
     boardLengthArray.push(i);
   }
+
   const [boardChange, setBoardChange] = useState(boardLengthArray);
+
   const colorOptions = [
     'red',
     'blue',
@@ -18,6 +21,7 @@ function ColorBoard(props: {tileNumber: number}) {
     'white',
     'pink'
   ];
+
   function randomizeArray() {
     let arrayLength = boardChange.length;
     const nums: number[] = [];
@@ -27,7 +31,9 @@ function ColorBoard(props: {tileNumber: number}) {
     }
     setBoardChange(nums);
   };
+
   const rows: Array<JSX.Element> = [];
+
   for (let i = 0; i < props.tileNumber; i++) {
     const row: Array<JSX.Element> = [];
     for (let j = 0; j < props.tileNumber; j++) {
@@ -36,6 +42,7 @@ function ColorBoard(props: {tileNumber: number}) {
     }
     rows.push(<div className="colorboardrow"> {...row} </div>);
   }
+  
   return (
     <div className="colorboardbox">
       {
