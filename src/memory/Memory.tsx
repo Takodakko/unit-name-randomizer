@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Card from '../hanafuda/Card';
 
 interface aCard {
@@ -38,15 +38,17 @@ interface aCard {
   }
 
 function Memory() {
-    const cardList = ['january_crane', 'january_scroll', 'january_plain1', 'january_plain2', 'february_bird', 'february_scroll', 'february_plain1', 'february_plain2', 'march_curtain', 'march_scroll', 'march_plain1', 'march_plain2', 'april_bird', 'april_scroll', 'april_plain1', 'april_plain2', 'may_dock', 'may_scroll', 'may_plain1', 'may_plain2', 'june_butterfly', 'june_scroll', 'june_plain1', 'june_plain2', 'july_boar', 'july_scroll', 'july_plain1', 'july_plain2', 'august_moon', 'august_geese', 'august_plain1', 'august_plain2', 'september_sake', 'september_scroll', 'september_plain1', 'september_plain2', 'october_deer', 'october_scroll', 'october_plain1', 'october_plain2', 'november_man', 'november_bird', 'november_bird', 'november_thunder', 'december_phoenix', 'december_plain1', 'december_plain2', 'december_plain3'];
-    // const rowLength = 6;
-    // const numberOfRows = 8;
+    const cardList = ['january_crane', 'january_scroll', 'january_plain1', 'january_plain2', 'february_bird', 'february_scroll', 'february_plain1', 'february_plain2', 'march_curtain', 'march_scroll', 'march_plain1', 'march_plain2', 'april_bird', 'april_scroll', 'april_plain1', 'april_plain2', 'may_dock', 'may_scroll', 'may_plain1', 'may_plain2', 'june_butterfly', 'june_scroll', 'june_plain1', 'june_plain2', 'july_boar', 'july_scroll', 'july_plain1', 'july_plain2', 'august_moon', 'august_geese', 'august_plain1', 'august_plain2', 'september_sake', 'september_scroll', 'september_plain1', 'september_plain2', 'october_deer', 'october_scroll', 'october_plain1', 'october_plain2', 'november_man', 'november_scroll', 'november_bird', 'november_thunder', 'december_phoenix', 'december_plain1', 'december_plain2', 'december_plain3'];
+    const [hardMode, setHardMode] = useState(false);
+    const numberOfTurnsHard = 4;
+    const numberOfTurnsEasy = 72;
+    const [remainingTurns, setRemainingTurns] = useState(numberOfTurnsEasy);
     const initialState: GameState = {
         win: false,
         faceDownCards: [],
         faceUpCards: [],
         matchingCards: [],
-        currentMonth: initialMonthMatching
+        currentMonth: {...initialMonthMatching}
     };
     
     const refStorage = new Map();
@@ -59,6 +61,13 @@ function Memory() {
     const [cardSet, setCardSet] = useState(initialCardSet);
     const [played, setPlayed] = useState(false);
     const [isPlaying, setIsPlaying] = useState(false);
+
+
+    useEffect(() => {
+      if (remainingTurns < 1) {
+        setGameState({...gameState, win: true});
+      }
+    }, [remainingTurns, gameState.win]);
 
     function initializeCardValues() {
         const cards = [];
@@ -78,14 +87,22 @@ function Memory() {
           copyCardList.splice(randomNumber, 1);
         }
         setCardSet(cards);
+        setHardMode(false);
+        setRemainingTurns(numberOfTurnsEasy);
         const copyGameState = {...gameState};
+        copyGameState.win = false;
         copyGameState.faceUpCards = [];
         copyGameState.faceDownCards = [...cards];
         copyGameState.matchingCards = [];
+        copyGameState.currentMonth = {...initialMonthMatching};
         setGameState(copyGameState);
       }
     
     function flipCard (id: string, e: React.SyntheticEvent) {
+      console.log(gameState.win, 'won?')
+      if (remainingTurns < 1) {
+        return;
+      }
       const target = e.target as HTMLImageElement;
       console.log('flip', id);
       const copyGameState = {...gameState};
@@ -100,6 +117,7 @@ function Memory() {
         if (copyGameState.faceUpCards.length >= 2) {
             return;
         }
+        setRemainingTurns(remainingTurns - 1);
         cardToChange.faceUp = true;
         const currentCardElement = refStorage.get(cardToChange.id);
         if (copyGameState.currentMonth[cardToChange.monthValue] === 1) {
@@ -183,12 +201,29 @@ function Memory() {
         else return resetButton;
       }
     }
+
+    function toggleHardMode() {
+      if (isPlaying) return;
+      if (!hardMode) setRemainingTurns(numberOfTurnsHard);
+      else setRemainingTurns(numberOfTurnsEasy);
+      setHardMode(!hardMode);
+    }
+
+    function hardModeButtonClass() {
+      if (!hardMode) return 'hardmodebutton'
+      else return 'hardmodebutton chosen'
+    }
+
     
 
+    if (!gameState.win) {
     return (
         <>
-          {makeActionButton()}
-          {isPlaying ? Math.floor(gameState.matchingCards.length / 2) : null}
+          <div className={hardModeButtonClass()}>
+            <button className={hardMode ? "chosenbutton" : ""} onClick={() => toggleHardMode()}>Hard Mode {hardMode ? "is On" : "is Off"}</button>
+          </div>
+          {makeActionButton()} <br></br>Points: {isPlaying ? Math.floor(gameState.matchingCards.length / 2) : null}<br></br>
+          Turns left: {remainingTurns}
           <div className="memoryboard">
             {layoutRow(deckToUse, 0, 8)}
             {layoutRow(deckToUse, 8, 16)}
@@ -199,6 +234,23 @@ function Memory() {
           </div>
         </>
     )
+  } else {
+    return (
+      <>
+        <div>
+          {(gameState.matchingCards.length / 2) === 24 ? "You Win!!!" : "Better luck next time"}
+        </div><br></br>
+        <div>
+          Turns left: {remainingTurns}<br></br>
+          Points achieved: {Math.floor(gameState.matchingCards.length / 2)}
+        </div><br></br>
+        <div>
+          {makeActionButton()}
+        </div>
+        
+      </>
+    )
+  }
 };
 
 export default Memory;

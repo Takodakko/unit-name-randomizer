@@ -109,3 +109,18 @@
 .hanafudabutton {
   margin: 5px;
 }
+
+.hardmodebutton {
+  position: fixed;
+  right: 50px;
+}
+
+.chosen {
+  border: 1px solid transparent;
+  border-color: red;
+}
+
+.chosenbutton {
+  color: red;
+  background-color: orange;
+}
